@@ -1,7 +1,7 @@
 # 專案建立&模擬 步驟
 ## Step 1: 用文字編輯器撰寫程式碼
 
-隨意路徑隨意(**不要有中文**)
+路徑隨意(**不要有中文**)
 
 ![](https://i.imgur.com/0QXYbTk.png)
 
@@ -32,12 +32,12 @@ Project name、Library name隨意命名
 
 程式庫(Library)已有對應的檔案
 
-![](https://i.imgur.com/kPGUYSW.png)
+![](https://i.imgur.com/aYm56h3.png)
 
 
 ## Step 4: 模擬
 
-對t(module)按右鍵>Simulate
+對test bench檔案t(module)按右鍵>Simulate
 
 ![](https://i.imgur.com/UqrBmuk.png)
 <br> <br>
