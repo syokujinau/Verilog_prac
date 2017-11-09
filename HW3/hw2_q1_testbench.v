@@ -1,6 +1,6 @@
 /* test bench for design (a) */
 module stimulus_a;
-reg din;  	
+reg din;    
 reg reset;
 wire q;
 
@@ -21,6 +21,7 @@ reset = 1'b0;
 #10 din = 1'b0;
 #5  reset = 1'b0;
 #7  din = 1'b1;
+//#10 $finish;
 end
 endmodule
 
@@ -29,21 +30,28 @@ endmodule
 /* test bench for design (b) */
 module stimulus_b;
 reg enable;
+reg rst;
+reg tin;
 reg clock;  
 wire q;
 
 /* instantiate your FF design here */
-T_FF    T_FF(.Q(q), .T(0), .clk(clock), .rst(0), .en(enable));
+//nagative edge trigger T FF with active low enable
+T_FF    T_FF(.Q(q), .T(tin), .clk(clock), .en(enable), .rst(rst));
 /* clock signal generation */
 initial clock = 1'b0;
 always  #5 clock = ~clock;
 
 /* stimulus waveforms */ 
 initial begin
+tin = 1'b1;
 enable = 1'b1;
+rst = 1;
+#10 rst = 0;
 #25 enable = 1'b0;
 #30 enable = 1'b1;
 #20 enable = 1'b0;
+#10 $finish;
 end
 endmodule
 
@@ -77,5 +85,6 @@ din = 8'hF0;
 #10 din = 8'h22;
 #5 din = 8'h33;
 #5 din = 8'h44;
+//#10 $finish;
 end
 endmodule

@@ -10,5 +10,5 @@ always @(negedge reset or posedge clk)
         if(clk && set) //reset = 1 and clk = 1
             Reg_Out = 8'b1111_1111;
         else
-            Reg_Out = Reg_Out;
+            Reg_Out = Reg_In;
 endmodule
