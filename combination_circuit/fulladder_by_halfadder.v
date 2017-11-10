@@ -15,7 +15,7 @@ module FullAdder(
   output sum,
   output cout
 );
-wire s0, c0, c1; //????
+wire s0, c0, c1; 
   HalfAdder HA0(a, b, s0, c0);
   HalfAdder HA1(cin, s0, sum, c1);
   or        OR(cout, c0, c1);
