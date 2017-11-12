@@ -16,10 +16,11 @@ always  #5 clock = ~clock;
 /* stimulus waveforms */
 initial begin
 rst = 1;
+#10 
+rst = 0;
 din_a = 8'h04;
 din_b = 8'h03;
 #10 
-rst = 0;
 din_a = 8'h02;
 din_b = 8'h06;
 #10 
@@ -28,6 +29,7 @@ din_b = 8'h02;
 #10 
 din_a = 8'h04;
 din_b = 8'h06;
-#10 $finish;
+#20 $finish;
 end
 endmodule
+

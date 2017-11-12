@@ -1,13 +1,11 @@
-module T_FF(Q, T, clk, en, rst);
+module T_FF(Q, T, clk, rst);
 output Q;
-input  T, clk, en, rst;
+input  T, clk, rst;
 reg    Q;
 always @(posedge rst or negedge clk)
   if(rst)
     Q = 0;
   else
-    if(!en) //enable
-      Q <= (T) ? ~Q : Q;
-    else    
-      Q <= Q;
+    Q <= (T) ? ~Q : Q;
 endmodule 
+

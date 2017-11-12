@@ -8,3 +8,4 @@ always @(posedge clk) //正緣觸發,同步active high reset
     else
         q <= d;
 endmodule 
+
