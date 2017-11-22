@@ -101,7 +101,7 @@ begin
     #20  
     {clear, load, enable, mode} = 4'b0010;
     data_in = 4'd8;
-  end
+  end  
   #20 //24
   {clear, load, enable, mode} = 4'b1011;
   data_in = 4'd8;
