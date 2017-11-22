@@ -30,12 +30,12 @@ begin
         `sr: 
             data_out = data_in >> size;
         `rl:
-            while(size--)
+            while(size = size - 1)
             begin
                 data_out = {data_in[6:0], data_in[7]};
             end
         `rr:
-            while(size--)
+            while(size = size - 1)
             begin
                 data_out = {data_in[7:1], data_in[0]};
             end 
