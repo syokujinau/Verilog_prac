@@ -1,7 +1,8 @@
-`define sl 2'b00
-`define sr 2'b01
-`define rl 2'b10
-`define rr 2'b11
+/*定義mode*/
+`define sl 2'b00  // shift left
+`define sr 2'b01  // shift right
+`define rl 2'b10  // rotate left
+`define rr 2'b11  // rotate right
 
 module barrel_shifter(
     data_in,
@@ -44,9 +45,9 @@ begin
     if(mode == `rl)      
     begin
         tmp = {data, data} << size; //複製2倍寬，再左移
-        rotate = tmp[15:8];  //取前1/2 bit，即為旋轉
+        rotate = tmp[15:8];  //return前1/2 bit，即為左旋
     end 
-    else if(mode == `rr) 
+    else if(mode == `rr)  //反之為右旋
     begin
         tmp = {data, data} >> size;
         rotate = tmp[7:0];
@@ -61,6 +62,7 @@ reg [7:0] din;
 reg [1:0] m;
 reg [1:0] s;
 wire [7:0] dout; 
+/*Instantiate*/
 barrel_shifter barrel_shifter(
     din,
     m,

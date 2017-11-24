@@ -1,3 +1,4 @@
+/*定義各種運算*/
 `define BitwiseOR   3'b000
 `define BitwiseAND  3'b001
 `define BitwiseXOR  3'b010
@@ -19,6 +20,7 @@ reg Z,C;
 
 always@(A, B, code)
 begin
+    /*依照opcode輸出運算結果*/
     case(code)
         `BitwiseOR  : Y = A | B;
         `BitwiseAND : Y = A & B;
@@ -30,6 +32,8 @@ begin
         `Decrement  : Y = A - 1;
         default: $display("ERROR");
     endcase
+
+    /*設定旗標C、Y*/
     if(code[2] == 0) //Logical
     begin 
         C = 0;
@@ -76,6 +80,7 @@ reg [7:0] A, B;
 reg [2:0] code;
 wire [7:0] Y;
 wire Z, C;
+/*Instantiate*/
 alu8b alu8b(Y, C, Z, A, B, code);
 initial
 begin

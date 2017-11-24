@@ -1,3 +1,8 @@
+/*
+4bit comparator
+輸入: 4bit A， 4bit B
+輸出: 大於、等於、小於
+*/
 module comp4b(data_a, data_b, gt, eq, lt);
 input [3:0] data_a, data_b;
 output gt, eq, lt;
@@ -10,6 +15,9 @@ begin
 end 
 endmodule
 
+/*
+結合4個4bit comparator，比較16bit大小關係
+*/
 module seg_comp(gt, eq, lt, A_gt_B, A_eq_B, A_lt_B);
 input [3:0] gt;
 input [3:0] eq;
@@ -18,6 +26,7 @@ output A_gt_B, A_eq_B, A_lt_B;
 reg A_gt_B, A_eq_B, A_lt_B;
 always@(gt, eq, lt)
 begin
+    //比較MSB的大小，若相等則比較下一個bit
     if(gt[3] == 1)      {A_gt_B, A_eq_B, A_lt_B} = 3'b100;
     else if(lt[3] == 1) {A_gt_B, A_eq_B, A_lt_B} = 3'b001;
     else //bit3 is equal, check bit2
@@ -49,6 +58,7 @@ wire A_gt_B, A_eq_B, A_lt_B;
 wire [3:0] gt;
 wire [3:0] eq;
 wire [3:0] lt;
+/*Instantiate*/
 comp4b c3(A[15:12], B[15:12], gt[3], eq[3], lt[3]),
        c2(A[11: 8], B[11: 8], gt[2], eq[2], lt[2]),
        c1(A[ 7: 4], B[ 7: 4], gt[1], eq[1], lt[1]),

@@ -8,7 +8,7 @@ module universal_counter(
   clk
 );
 input [3:0] data_in;
-input load;
+input load;  
 input clear;
 input mode; 
 input enable;
@@ -18,7 +18,7 @@ reg [3:0] count;
 
 always@(posedge clk)
 begin 
-  
+    //priority : clear > load  >enable
     if(clear)
       count <= 4'b0;
     else 
@@ -51,7 +51,7 @@ reg mode;
 reg clk;
 wire [3:0] count;
 
-
+/*Instantiate*/
 universal_counter universal_counter(
   data_in,
   load,
