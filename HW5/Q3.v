@@ -1,12 +1,28 @@
-/*3bit counter for head & tail pointer*/
-module Counter_3bit(
+/*3bit counter head pointer*/
+module head_ptr(
+    input clk, 
+    input en, 
+    output reg [2:0] Q, 
+    input rst
+);
+always@(posedge clk) begin
+    if(rst) Q <= 3'b001;
+    else begin
+        if(en) Q <= Q + 1;
+        else Q <= Q; //也可不assign 
+    end 
+end 
+endmodule
+
+/*3bit counter tail pointer*/
+module tail_ptr(
     input clk, 
     input en, 
     output reg [2:0] Q, 
     input rst
 );
 always@(negedge clk) begin
-    if(rst) Q <= 3'b000;
+    if(rst) Q <= 3'b001;
     else begin
         if(en) Q <= Q + 1;
         else Q <= Q; //也可不assign 
@@ -19,13 +35,17 @@ module Flags(
     input [2:0] head,
     input [2:0] tail,
     output reg full,
-    output reg empty
+    output reg empty,
+    input clear
 );
-always@(head, tail) begin 
-    if(head == tail) {full, empty} = 2'b01;
-    else if((tail + 1) == head) {full, empty} = 2'b10;
-    else {full, empty} = 2'b00;
-end
+always@(clear, head, tail) begin
+    if(clear) {full, empty} = 2'b01;
+    else begin
+        if(head == tail)            {full, empty} = 2'b01;
+        else if((tail + 1) == head) {full, empty} = 2'b10;
+        else                        {full, empty} = 2'b00; 
+    end 
+end 
 endmodule
 
 /*Circular buffer for Queue storage*/
@@ -37,25 +57,74 @@ module Circular_buffer(
 );
 reg [7:0] mem [0:7];
 always@(rw, addr) begin
-    if(rw) begin //write
+    if(rw) begin //rw = 1 write
         mem[addr] = data_in;
         data_out = 8'bzzzz_zzzz;
     end 
-    else begin //read
+    else begin //rw = 0 read
         data_out = mem[addr];
     end 
 end 
 endmodule
 
-module FSM(
+/*Insert_FSM*/
+module Insert_FSM(
     input clk,
-    input ret,
     input ins, 
-    output h_en, 
-    output t_en,
-    output rw
+    input full,
+    input clear,
+    output reg tail_en,
+    output reg rw
 );
-//??
+reg state, next_state;
+parameter A = 1'b0,
+          B = 1'b1;
+always@(posedge clk) begin
+    if(clear) state <= 1'b0;
+    else state <= next_state;
+end 
+always@(ins, full, state) begin
+    case(state)
+        A : next_state = ({ins, full} == 2'b10) ? B : A;
+        B : next_state = ({ins, full} == 2'b10) ? B : A;
+    endcase
+end
+always@(ins, full, state) begin
+    case(state)
+        A : {rw, tail_en} = ({ins, full} == 2'b10) ? 2'b11 : 2'b00;
+        B : {rw, tail_en} = ({ins, full} == 2'b10) ? 2'b11 : 2'b00;
+    endcase
+end 
+endmodule
+
+/*Retrive_FSM*/
+module Retrive_FSM(
+    input clk,
+    input ret, 
+    input empty,
+    input clear,
+    output reg head_en,
+    output reg rw
+);
+reg state, next_state;
+parameter C = 1'b0,
+          D = 1'b1;
+always@(negedge clk) begin
+    if(clear) state <= 1'b0;
+    else state <= next_state;
+end 
+always@(ret, empty, state) begin
+    case(state)
+        C : next_state = ({ret, empty} == 2'b10) ? D : C;
+        D : next_state = ({ret, empty} == 2'b10) ? D : C;
+    endcase
+end
+always@(ret, empty, state) begin
+    case(state)
+        C : {rw, head_en} = ({ret, empty} == 2'b10) ? 2'b01 : 2'b00;
+        D : {rw, head_en} = ({ret, empty} == 2'b10) ? 2'b01 : 2'b00;
+    endcase
+end 
 endmodule
 
 module Queue(
@@ -68,7 +137,23 @@ module Queue(
     output full,
     output empty
 );
-//??
+wire h_en, t_en;
+wire [2:0] h_addr, t_addr, in_addr;
+wire in_full, in_empty; 
+wire Ins_rw, Ret_rw, in_rw;
+
+head_ptr head_ptr(clk, h_en, h_addr, clear);
+tail_ptr tail_ptr(clk, t_en, t_addr, clear);
+Flags Flags(h_addr, t_addr, in_full, in_empty, clear);
+Circular_buffer Circular_buffer(data_in, data_out, in_addr, in_rw);
+Insert_FSM Insert_FSM(clk, insert, in_full, clear, t_en, Ins_rw);
+Retrive_FSM Retrive_FSM(clk, retrieve, in_empty, clear, h_en, Ret_rw);
+
+assign in_addr = (in_rw) ? t_addr : h_addr;
+assign in_rw = Ins_rw | Ret_rw;
+assign full = in_full;
+assign empty = in_empty;
+
 endmodule
 
 /*testbench*/
@@ -126,8 +211,8 @@ initial begin
     @(posedge clk);
     for(i=0;i<10;i=i+1)begin  //insert 10 times 0 4 8 12 16 20 24 28 ...
         // {insert, retrieve} = 10
-        insert = 1'b1;     //只間隔一個clk就insert??
-        data_in = data_in + 8'd4;           //ok??
+        insert = 1'b1;     
+        data_in = data_in + 8'd4;        
         @(posedge clk);
     end
     // {insert, retrieve} = 00
